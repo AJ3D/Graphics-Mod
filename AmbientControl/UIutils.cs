@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ColossalFramework.UI;
 
-namespace AmbientControl
+namespace LightControl
 {
     public class UIUtils
     {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LightControl
 {
-    class Data
+    class LightManager
     {
     }
 }

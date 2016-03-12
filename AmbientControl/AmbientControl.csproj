@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Data.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="LightManager.cs" />
     <Compile Include="Loading.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="LightSettingsPanel.cs" />

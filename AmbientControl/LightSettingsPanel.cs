@@ -2,22 +2,24 @@
 using UnityEngine;
 using ColossalFramework.UI;
 
-namespace AmbientControl
+namespace LightControl
 {
     class LightSettingsPanel : UIPanel
     {
+      
+
         public UIButton save;
-        public UISlider ambiantIntensity;
-        public UISlider sunIntensity;
         public UIButton reset;
-        public UIPanel dropdowns;
-        public UIDropDown lud;
+
+
         public UITitleBar m_title;
+
         public ColorOptions colorPanel;
+        public SunOptions sunOptions;
 
         private const float LEFT_WIDTH = 250;
         private const float RIGHT_WIDTH = 250;
-        private const float HEIGHT = 300;
+        private const float HEIGHT = 225;
         private const float SPACING = 5;
         private const float TITLE_HEIGHT = 40;
 
@@ -63,6 +65,10 @@ namespace AmbientControl
             isVisible = true;
             canFocus = true;
             isInteractive = true;
+
+            padding = new RectOffset(10, 10, 4, 4);
+           
+
             width = SPACING + LEFT_WIDTH + SPACING + SPACING + RIGHT_WIDTH + SPACING;
             height = TITLE_HEIGHT + HEIGHT + SPACING;
             relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
@@ -102,11 +108,17 @@ namespace AmbientControl
             right.relativePosition = new Vector3(LEFT_WIDTH + SPACING, TITLE_HEIGHT + SPACING);
 
             colorPanel = right.AddUIComponent<ColorOptions>();
-            colorPanel.width = RIGHT_WIDTH;
-            colorPanel.height = 120;
+            colorPanel.width = RIGHT_WIDTH - 4;
+            colorPanel.height = 220;
             colorPanel.relativePosition = new Vector3(0, 0);
 
+            sunOptions = left.AddUIComponent<SunOptions>();
+            sunOptions.width = LEFT_WIDTH - 4;
+            sunOptions.height = 220;
+            sunOptions.relativePosition = new Vector3(0, 0);
+
         }
+       
 
         public void Toggle()
         {
@@ -125,19 +137,16 @@ namespace AmbientControl
     public class ColorOptions : UIPanel
     {
 
-
         private UICheckBox m_include;
         public UIDropDown ludDropdown;
-        public UIDropDown subService;
-        public UIDropDown level;
-        public UITextField homeCount;
+        public UIButton reset;
+        public UIButton save;
 
         private static ColorOptions _instance;
         public static ColorOptions instance
         {
             get { return _instance; }
         }
-
 
         public override void Start()
         {
@@ -156,18 +165,8 @@ namespace AmbientControl
 
         private void SetupControls()
         {
-
             // Include
             m_include = UIUtils.CreateCheckBox(this);
-            m_include.text = "Include";
-            m_include.isVisible = false;
-
-            // Level
-            UILabel levelLabel = AddUIComponent<UILabel>();
-            levelLabel.textScale = 0.8f;
-            levelLabel.padding = new RectOffset(0, 0, 8, 0);
-            levelLabel.text = "Service: ";
-            //levelLabel.relativePosition = new Vector3(status.relativePosition.x + status.width + 10, 40);
 
             ludDropdown = UIUtils.CreateDropDown(this);
             ludDropdown.width = 180;
@@ -178,56 +177,95 @@ namespace AmbientControl
             }
 
             ludDropdown.selectedIndex = ColorCorrectionManager.instance.lastSelection;
+            ludDropdown.eventSelectedIndexChanged += (c, i) => ColorCorrectionManager.instance.currentSelection = i; 
 
-            ludDropdown.eventSelectedIndexChanged += (c, i) => ColorCorrectionManager.instance.currentSelection = i;
+            reset = UIUtils.CreateButton(this);
+            reset.width = 90;
+            reset.text = "Reset";
 
-            //service.relativePosition = new Vector3(levelLabel.relativePosition.x + levelLabel.width + 5, 40);
-
-            subService = UIUtils.CreateDropDown(this);
-            subService.width = 180;
-            subService.AddItem("None");
-            subService.AddItem("Residential");
-            subService.AddItem("Industrial");
-            subService.AddItem("Office");
-            subService.AddItem("Commercial");
-            subService.AddItem("Extractor");
-            subService.selectedIndex = 0;
-
-            //lud.selectedIndex = ColorCorrectionManager.instance.lastSelection;
-           // lud.eventSelectedIndexChanged += (c, i) => ColorCorrectionManager.instance.currentSelection = i;
-
-            homeCount = UIUtils.CreateTextField(this);
-            homeCount.width = 180;
+            save = UIUtils.CreateButton(this);
+            save.width = 90;
+            save.text = "Save";
 
         }
 
-        public override void Update()
-        {
-
-        }
-
-
-        protected override void OnMouseDown(UIMouseEventParameter p)
-        {
-            p.Use();
-            //UIThemeManager.instance.ChangeUpgradeBuilding(m_building);
-
-            base.OnMouseDown(p);
-        }
-
-        protected override void OnMouseEnter(UIMouseEventParameter p)
-        {
-            base.OnMouseEnter(p);
-            //UIThemeManager.instance.buildingPreview.Show(m_building);
-        }
-
-
-        protected override void OnMouseLeave(UIMouseEventParameter p)
-        {
-            base.OnMouseLeave(p);
-            //UIThemeManager.instance.buildingPreview.Show(UIThemeManager.instance.selectedBuilding);
-        }
-
+ 
     }
+    public class SunOptions : UIPanel
+    {
 
+        UISlider heightSlider;
+        UISlider rotationSlider;
+        UISlider intensitySlider;
+        UISlider ambientSlider;
+
+        private static SunOptions _instance;
+        public static SunOptions instance
+        {
+            get { return _instance; }
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            _instance = this;
+            isVisible = true;
+            canFocus = true;
+            isInteractive = true;
+            backgroundSprite = "UnlockingPanel";
+
+            autoLayoutPadding = new RectOffset(10, 10, 4, 4);
+            autoLayout = true;
+            //autoFitChildrenVertically = true;
+            autoLayoutDirection = LayoutDirection.Vertical;
+
+            //autoLayoutPadding.top = 5;
+            SetupControls();
+        }
+
+        private void SetupControls()
+        {
+
+            AddUIComponent<UILabel>().text = "Height";
+            heightSlider = UIUtils.CreateSlider(this, -80f, 80f);
+            heightSlider.eventValueChanged += ValueChanged;
+
+            AddUIComponent<UILabel>().text = "Rotation";
+            rotationSlider = UIUtils.CreateSlider(this, -180f, 180f);
+            rotationSlider.eventValueChanged += ValueChanged;
+
+            AddUIComponent<UILabel>().text = "Intensity";
+            intensitySlider = UIUtils.CreateSlider(this, 0f, 10f);
+            intensitySlider.eventValueChanged += ValueChanged;
+            intensitySlider.stepSize = 0.1f;
+
+            AddUIComponent<UILabel>().text = "Ambient";
+            ambientSlider = UIUtils.CreateSlider(this, 0f, 2f);
+            ambientSlider.eventValueChanged += ValueChanged;
+            ambientSlider.stepSize = 0.1f;
+        }
+
+        void ValueChanged(UIComponent component, float value)
+        {
+            if (component == heightSlider)
+            {
+                DayNightProperties.instance.m_Latitude = value;
+            }
+
+            if (component == rotationSlider)
+            {
+                DayNightProperties.instance.m_Longitude = value;
+            }
+
+            if (component == ambientSlider)
+            {
+                DayNightProperties.instance.m_Exposure = value;
+            }
+
+            if (component == intensitySlider)
+            {
+                DayNightProperties.instance.m_SunIntensity = value;
+            }
+        }
+    }
 }

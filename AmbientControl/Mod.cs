@@ -1,6 +1,6 @@
 ﻿using ICities;
 
-namespace AmbientControl
+namespace LightControl
 {
     public class Mod : IUserMod
     {
