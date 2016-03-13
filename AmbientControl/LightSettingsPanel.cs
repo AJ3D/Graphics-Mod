@@ -50,8 +50,6 @@ namespace LightControl
             }
             catch (Exception e)
             {
-                // Catching any exception to not block the loading process of other mods
-                Debug.Log("Building Themes: An error has happened during the UI creation.");
                 Debug.LogException(e);
             }
         }
