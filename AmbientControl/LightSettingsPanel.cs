@@ -8,24 +8,23 @@ namespace LightControl
     {
       
 
-        public UIButton save;
-        public UIButton reset;
-
-
         public UITitleBar m_title;
 
-        public ColorOptions colorPanel;
-        public SunOptions sunOptions;
+        public ColorPanel colorPanel;
+        public LightPanel lightPanel;
 
-        private const float LEFT_WIDTH = 250;
-        private const float RIGHT_WIDTH = 250;
-        private const float HEIGHT = 225;
+        public UITabstrip panelTabs;
+
+        public UIButton lightButton;
+        public UIButton colorButton;
+        public UIButton engineButton;
+        public UIButton presetButton;
+
+        private const float WIDTH = 270;
+        private const float HEIGHT = 350;
         private const float SPACING = 5;
-        private const float TITLE_HEIGHT = 40;
-
-        private float originalSun;
-        private float originalExposure;
-        private float sunIntensityOffset;
+        private const float TITLE_HEIGHT = 36;
+        private const float TABS_HEIGHT = 28;
 
         private static GameObject _gameObject;
 
@@ -61,19 +60,15 @@ namespace LightControl
         {
             base.Start();
 
-            backgroundSprite = "UnlockingPanel2";
+            backgroundSprite = "PoliciesBubble";
             isVisible = true;
             canFocus = true;
             isInteractive = true;
-
             padding = new RectOffset(10, 10, 4, 4);
-           
-
-            width = SPACING + LEFT_WIDTH + SPACING + SPACING + RIGHT_WIDTH + SPACING;
-            height = TITLE_HEIGHT + HEIGHT + SPACING;
+            width = SPACING + WIDTH;
+            height = TITLE_HEIGHT + HEIGHT + TABS_HEIGHT + SPACING;
             relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 
-            // InitBuildingLists();
             SetupControls();
         }
 
@@ -94,31 +89,62 @@ namespace LightControl
         {
        
             m_title = AddUIComponent<UITitleBar>();
-            m_title.title = "Light Settings";
-            m_title.iconSprite = "ToolbarIconZoomOutCity";
+            m_title.title = "Graphics Settings";
 
-            UIPanel left = AddUIComponent<UIPanel>();
-            left.width = LEFT_WIDTH;
-            left.height = HEIGHT ;
-            left.relativePosition = new Vector3(SPACING, TITLE_HEIGHT +  SPACING);
+            panelTabs = AddUIComponent<UITabstrip>();
+            panelTabs.relativePosition = new Vector2(SPACING, TITLE_HEIGHT + SPACING);
+            panelTabs.size = new Vector2(WIDTH, TABS_HEIGHT);
+            panelTabs.padding = new RectOffset(2, 2, 2, 2);
 
-            UIPanel right = AddUIComponent<UIPanel>();
-            right.width = RIGHT_WIDTH;
-            right.height = HEIGHT;
-            right.relativePosition = new Vector3(LEFT_WIDTH + SPACING, TITLE_HEIGHT + SPACING);
+            lightButton = UIUtils.CreateTab(panelTabs, "Light");
+            colorButton = UIUtils.CreateTab(panelTabs, "Color");
+            engineButton = UIUtils.CreateTab(panelTabs, "Engine");
+            presetButton = UIUtils.CreateTab(panelTabs, "Presets");
 
-            colorPanel = right.AddUIComponent<ColorOptions>();
-            colorPanel.width = RIGHT_WIDTH - 4;
-            colorPanel.height = 220;
+            UIPanel body = AddUIComponent<UIPanel>();
+            body.width = WIDTH;
+            body.height = HEIGHT ;
+            body.relativePosition = new Vector3(SPACING, TITLE_HEIGHT + TABS_HEIGHT +  SPACING);
+
+            lightPanel = body.AddUIComponent<LightPanel>();
+            lightPanel.width = WIDTH - SPACING;
+            lightPanel.height = HEIGHT;
+            lightPanel.relativePosition = new Vector3(0, 0);
+            lightPanel.isVisible = false;
+
+            colorPanel = body.AddUIComponent<ColorPanel>();
+            colorPanel.width = WIDTH - SPACING;
+            colorPanel.height = HEIGHT;
             colorPanel.relativePosition = new Vector3(0, 0);
+            colorPanel.isVisible = false;
 
-            sunOptions = left.AddUIComponent<SunOptions>();
-            sunOptions.width = LEFT_WIDTH - 4;
-            sunOptions.height = 220;
-            sunOptions.relativePosition = new Vector3(0, 0);
+            lightButton.eventClick += (sender, e) => TabClicked(sender, e);
+            colorButton.eventClick += (sender, e) => TabClicked(sender, e);
+            engineButton.eventClick += (sender, e) => TabClicked(sender, e);
+            presetButton.eventClick += (sender, e) => TabClicked(sender, e);
 
         }
-       
+        void TabClicked(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            lightPanel.isVisible = false;
+            colorPanel.isVisible = false;
+
+            if (component == lightButton) {
+                lightPanel.isVisible = true;
+            }
+            if (component == colorButton)
+            {
+                colorPanel.isVisible = true;
+            }
+            if (component == engineButton)
+            {
+                lightPanel.isVisible = true;
+            }
+            if (component == presetButton)
+            {
+                lightPanel.isVisible = true;
+            }
+        }
 
         public void Toggle()
         {
@@ -131,10 +157,9 @@ namespace LightControl
                 Show(true);
             }
         }
-
     }
 
-    public class ColorOptions : UIPanel
+    public class ColorPanel : UIPanel
     {
 
         private UICheckBox m_include;
@@ -142,8 +167,8 @@ namespace LightControl
         public UIButton reset;
         public UIButton save;
 
-        private static ColorOptions _instance;
-        public static ColorOptions instance
+        private static ColorPanel _instance;
+        public static ColorPanel instance
         {
             get { return _instance; }
         }
@@ -152,7 +177,7 @@ namespace LightControl
         {
             base.Start();
             _instance = this;
-            isVisible = true;
+            //isVisible = true;
             canFocus = true;
             isInteractive = true;
             backgroundSprite = "UnlockingPanel";
@@ -160,6 +185,7 @@ namespace LightControl
             autoLayout = true;
             autoLayoutDirection = LayoutDirection.Vertical;
             autoLayoutPadding.top = 5;
+
             SetupControls();
         }
 
@@ -186,12 +212,10 @@ namespace LightControl
             save = UIUtils.CreateButton(this);
             save.width = 90;
             save.text = "Save";
-
         }
-
- 
     }
-    public class SunOptions : UIPanel
+
+    public class LightPanel : UIPanel
     {
 
         UISlider heightSlider;
@@ -199,8 +223,8 @@ namespace LightControl
         UISlider intensitySlider;
         UISlider ambientSlider;
 
-        private static SunOptions _instance;
-        public static SunOptions instance
+        private static LightPanel _instance;
+        public static LightPanel instance
         {
             get { return _instance; }
         }
@@ -209,7 +233,7 @@ namespace LightControl
         {
             base.Start();
             _instance = this;
-            isVisible = true;
+            //isVisible = true;
             canFocus = true;
             isInteractive = true;
             backgroundSprite = "UnlockingPanel";
@@ -268,4 +292,5 @@ namespace LightControl
             }
         }
     }
-}
+
+    }

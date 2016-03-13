@@ -25,6 +25,21 @@ namespace LightControl
             return button;
         }
 
+        public static UIButton CreateTab(UIComponent tabstrip, string text) {
+
+            UIButton tab = tabstrip.AddUIComponent<UIButton>();
+
+            tab.size = new Vector2(62f, 28f);
+            tab.text = text;
+            tab.normalBgSprite = "GenericTab";
+            tab.hoveredBgSprite = "GenericTabHovered";
+            tab.pressedBgSprite = "GenericTabPressed";
+            tab.disabledBgSprite = "GenericTabDisabled";
+            tab.focusedBgSprite = "GenericTabFocused";
+            tab.tabStrip = true;
+            return tab;
+        }
+
         public static UISlider CreateSlider(UIPanel parent, float min, float max)
         {
             UIPanel bg = parent.AddUIComponent<UIPanel>();

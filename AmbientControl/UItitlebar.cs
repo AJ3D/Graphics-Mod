@@ -58,13 +58,15 @@ namespace LightControl
             m_drag.relativePosition = Vector3.zero;
             m_drag.target = parent;
 
-            m_icon = AddUIComponent<UISprite>();
-            m_icon.spriteName = iconSprite;
-            m_icon.relativePosition = new Vector3(10, 5);
+            //m_icon = AddUIComponent<UISprite>();
+            //m_icon.spriteName = iconSprite;
+            //m_icon.relativePosition = new Vector3(10, 5);
+            //m_icon.isInteractive = false;
 
             m_title = AddUIComponent<UILabel>();
-            m_title.relativePosition = new Vector3(50, 13);
+            m_title.relativePosition = new Vector3(80, 13);
             m_title.text = title;
+            m_title.isInteractive = false;
 
             m_close = AddUIComponent<UIButton>();
             m_close.relativePosition = new Vector3(width - 35, 2);
